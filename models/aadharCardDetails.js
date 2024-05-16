@@ -1,7 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class User extends Model {
+  class AadharCardDetails extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -10,40 +10,45 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
-    toJSON() {
-      return { ...this.get(), createdAt: undefined, updatedAt: undefined };
-    }
   }
-  User.init(
+  AadharCardDetails.init(
     {
       id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
+        allowNull: false,
       },
-      full_name: {
+      name: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          notEmpty: { msg: "User's FullName cant be empty" },
-          notNull: { msg: "User's FullName cant be null" },
+          notNull: {
+            msg: "name value is required",
+          },
+          notEmpty: {
+            msg: "name value cant be empty",
+          },
         },
       },
-      country_code: {
-        type: DataTypes.INTEGER,
+      aadharNumber: {
+        type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          notEmpty: { msg: "User's country_code cant be empty" },
-          notNull: { msg: "User's country_code cant be null" },
-          isInt: { msg: "country_code must be an integer" },
+          notNull: {
+            msg: "aadharNumber value is required",
+          },
+          notEmpty: {
+            msg: "aadharNumber value can't be empty",
+          },
         },
       },
     },
     {
+      tableName: "aadhar_card_details",
       sequelize,
-      tableName: "users",
-      modelName: "User",
+      modelName: "AadharCardDetails",
     }
   );
-  return User;
+  return AadharCardDetails;
 };

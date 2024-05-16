@@ -1,5 +1,6 @@
 "use strict";
 
+const { json } = require("express");
 const fs = require("fs");
 const path = require("path");
 const Sequelize = require("sequelize");
@@ -41,7 +42,5 @@ Object.keys(db).forEach((modelName) => {
 });
 
 db.sequelize = sequelize;
-
-console.log({ db });
 
 module.exports = db;
