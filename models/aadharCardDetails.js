@@ -7,8 +7,13 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
+    static associate({ User }) {
       // define association here
+      this.belongsTo(User, { foreignKey: "userId", as: "user" });
+    }
+
+    toJSON() {
+      return { ...this.get(), createdAt: undefined, updatedAt: undefined };
     }
   }
   AadharCardDetails.init(
@@ -40,6 +45,18 @@ module.exports = (sequelize, DataTypes) => {
           },
           notEmpty: {
             msg: "aadharNumber value can't be empty",
+          },
+        },
+      },
+      userId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: "user value is required",
+          },
+          notEmpty: {
+            msg: "user value can't be empty",
           },
         },
       },
