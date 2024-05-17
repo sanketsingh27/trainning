@@ -1,4 +1,4 @@
-const { User, AadharCardDetails } = require("../models");
+const { User, AadharCardDetails, Address } = require("../models");
 
 const { Router } = require("express");
 const UserRouter = Router();
@@ -135,4 +135,60 @@ UserRouter.get("/users/:id/aadhar", async (req, res) => {
   }
 });
 
+// - /users/:id/addresses
+//     - post will create address for a specific user
+//     - get will retrieve all the addressees for the user
+// - /users/:id/addresses/:id
+//     - get  will retrieve a specific address for a user
+//     - put will update the address of a user
+
+UserRouter.post("/users/:id/addresses", async (req, res) => {
+  const { id: userId } = req.params;
+
+  const { name, street, city, country } = req.body;
+
+  if (!name || !street || !city || !country || !userId) {
+    return res
+      .status(400)
+      .json({ message: "name or street or city or  country id is missing" });
+  }
+
+  try {
+    const user = await User.findByPk(userId);
+    if (!user)
+      return res.status(500).json({ message: `user ${userId} not found` });
+
+    const address = await Address.create({
+      name,
+      street,
+      city,
+      country,
+      userId,
+    });
+
+    res.status(201).json(address);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+});
+
+UserRouter.get("/users/:id/addresses", async (req, res) => {
+  const { id: userId } = req.params;
+
+  if (!userId) {
+    return res.status(400).json({ message: "id is required" });
+  }
+
+  try {
+    const address = await Address.findAll({
+      where: { userId },
+    });
+
+    res.status(201).json(address);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+});
 module.exports = UserRouter;
