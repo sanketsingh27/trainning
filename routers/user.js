@@ -1,4 +1,4 @@
-const { User } = require("../models");
+const { User, AadharCardDetails } = require("../models");
 
 const { Router } = require("express");
 const UserRouter = Router();
@@ -82,7 +82,7 @@ UserRouter.delete("/users/:id", async (req, res) => {
   }
 });
 
-UserRouter.post("users/:id/aadhar", async (req, res) => {
+UserRouter.post("/users/:id/aadhar", async (req, res) => {
   const { id: userId } = req.params;
   const { name, aadharNumber } = req.body;
 
@@ -103,7 +103,32 @@ UserRouter.post("users/:id/aadhar", async (req, res) => {
       userId,
     });
 
-    res.status(201).json(aadharDetails);
+    user.aadharId = aadharDetails.id;
+    const updatedUser = await user.save();
+
+    res.status(201).json({ user: updatedUser, aadhar: aadharDetails });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+});
+
+UserRouter.get("/users/:id/aadhar", async (req, res) => {
+  const { id: userId } = req.params;
+
+  if (!userId) {
+    return res.status(400).json({ message: "userId is required" });
+  }
+
+  try {
+    const user = await User.findByPk(userId, {
+      include: "aadhar_card_details",
+    });
+
+    if (!user)
+      return res.status(500).json({ message: `user ${userId} not found` });
+
+    res.status(200).json(user);
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);

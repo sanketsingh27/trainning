@@ -18,6 +18,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
+      aadharId: {
+        allowNull: true,
+        type: Sequelize.UUID,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

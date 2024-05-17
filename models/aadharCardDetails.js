@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({ User }) {
       // define association here
-      this.belongsTo(User, { foreignKey: "userId", as: "user" });
+      this.hasOne(User, { foreignKey: "aadharId", as: "user" });
     }
 
     toJSON() {
@@ -45,18 +45,6 @@ module.exports = (sequelize, DataTypes) => {
           },
           notEmpty: {
             msg: "aadharNumber value can't be empty",
-          },
-        },
-      },
-      userId: {
-        type: DataTypes.UUID,
-        allowNull: false,
-        validate: {
-          notNull: {
-            msg: "user value is required",
-          },
-          notEmpty: {
-            msg: "user value can't be empty",
           },
         },
       },

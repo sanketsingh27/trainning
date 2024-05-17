@@ -8,8 +8,8 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate({ AadharCardDetails }) {
-      this.hasOne(AadharCardDetails, {
-        foreignKey: "userId", // db field
+      this.belongsTo(AadharCardDetails, {
+        foreignKey: "aadharId", // db field
         as: "aadhar_card_details", //  what you are getting from db
       });
     }
@@ -40,6 +40,10 @@ module.exports = (sequelize, DataTypes) => {
           notNull: { msg: "User's country_code cant be null" },
           isInt: { msg: "country_code must be an integer" },
         },
+      },
+      aadharId: {
+        type: DataTypes.UUID,
+        allowNull: true,
       },
     },
     {
