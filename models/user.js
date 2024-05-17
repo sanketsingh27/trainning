@@ -9,8 +9,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({ AadharCardDetails }) {
       this.hasOne(AadharCardDetails, {
-        foreignKey: "userId",
-        as: "aadhar_card_details",
+        foreignKey: "userId", // db field
+        as: "aadhar_card_details", //  what you are getting from db
       });
     }
     toJSON() {

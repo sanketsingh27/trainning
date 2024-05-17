@@ -82,4 +82,32 @@ UserRouter.delete("/users/:id", async (req, res) => {
   }
 });
 
+UserRouter.post("users/:id/aadhar", async (req, res) => {
+  const { id: userId } = req.params;
+  const { name, aadharNumber } = req.body;
+
+  if (!name || !aadharNumber || !userId) {
+    return res
+      .status(400)
+      .json({ message: "name or aadharNumber or id is missing" });
+  }
+
+  try {
+    const user = await User.findByPk(userId);
+    if (!user)
+      return res.status(500).json({ message: `user ${userId} not found` });
+
+    const aadharDetails = await AadharCardDetails.create({
+      name,
+      aadharNumber,
+      userId,
+    });
+
+    res.status(201).json(aadharDetails);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+});
+
 module.exports = UserRouter;
