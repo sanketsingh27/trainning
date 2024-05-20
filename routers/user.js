@@ -1,4 +1,4 @@
-const { User, AadharCardDetails, Address, Rolls } = require("../models");
+const { User, AadharCardDetails, Address, Image } = require("../models");
 
 const { Router } = require("express");
 const UserRouter = Router();
@@ -329,6 +329,28 @@ UserRouter.put("/users/:userId/roles", async (req, res) => {
       noOfRolesRemoved: roleRemoved,
       rolesToRemove,
     });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+});
+
+// - post /images  → create image
+// - post /images/:id/comments → create a new comment attach it to image
+// - get /images/:id/comments → get all comment of a image
+
+UserRouter.post("/images", async (req, res) => {
+  const { url, width, height } = req.body;
+
+  if (!url || !width || !height) {
+    return res
+      .status(400)
+      .json({ message: "url , width and height are required" });
+  }
+
+  try {
+    const image = await Image.create({ url, width, height });
+    res.status(201).json(image);
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);
