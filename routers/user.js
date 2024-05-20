@@ -1,4 +1,4 @@
-const { User, AadharCardDetails, Address } = require("../models");
+const { User, AadharCardDetails, Address, Rolls } = require("../models");
 
 const { Router } = require("express");
 const UserRouter = Router();
@@ -242,4 +242,46 @@ UserRouter.put("/users/:userId/addresses/:addressId", async (req, res) => {
     return res.status(500).json(error);
   }
 });
+
+// - Add roles to a user    post  /users/:id/roles
+// - Get roles of a user      Get /users/:id/roles
+// - Remove some roles from a user    put /users/:id/roles
+
+UserRouter.post("/users/:userId/roles", async (req, res) => {
+  const { userId } = req.params;
+
+  const { roles } = req.body;
+
+  if (!userId || !roles) {
+    return res
+      .status(400)
+      .json({ message: "userId and roles both are required" });
+  }
+
+  try {
+    // check if user exist
+    let user = await User.findByPk(userId);
+
+    if (!user)
+      return res.status(500).json({ error: `user ${userId} not found` });
+
+    // check if roll exists
+    // const rolesInDb = await Rolls.findAll({
+    //   where: { id: roles },
+    //   attributes: ["id"],
+    // });
+
+    // const validRoles = roles.filter((roleId) => rolesInDb.includes(roleId));
+
+    // console.log({ validRoles });
+
+    const newAssociation = await user.addRolls(roles); // using mixin
+
+    res.status(201).json(newAssociation);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+});
+
 module.exports = UserRouter;
