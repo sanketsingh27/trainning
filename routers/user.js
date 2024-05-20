@@ -135,13 +135,6 @@ UserRouter.get("/users/:id/aadhar", async (req, res) => {
   }
 });
 
-// - /users/:id/addresses
-//     - post will create address for a specific user
-//     - get will retrieve all the addressees for the user
-// - /users/:id/addresses/:id
-//     - get  will retrieve a specific address for a user
-//     - put will update the address of a user
-
 UserRouter.post("/users/:id/addresses", async (req, res) => {
   const { id: userId } = req.params;
 
@@ -186,6 +179,64 @@ UserRouter.get("/users/:id/addresses", async (req, res) => {
     });
 
     res.status(201).json(address);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+});
+
+UserRouter.get("/users/:userId/addresses/:addressId", async (req, res) => {
+  const { userId, addressId } = req.params;
+
+  if (!userId || !addressId) {
+    return res
+      .status(400)
+      .json({ message: "userId and addressId both are required" });
+  }
+
+  try {
+    const address = await Address.findAll({
+      where: { userId, id: addressId },
+    });
+
+    res.status(201).json(address);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+});
+
+UserRouter.put("/users/:userId/addresses/:addressId", async (req, res) => {
+  const { userId, addressId } = req.params;
+
+  const validField = ["name", "street", "city", "country", "country"];
+
+  if (!userId || !addressId) {
+    return res
+      .status(400)
+      .json({ message: "userId and addressId both are required" });
+  }
+
+  try {
+    let address = await Address.findOne({
+      where: {
+        userId,
+        id: addressId,
+      },
+    });
+
+    if (!address)
+      return res.status(500).json({ error: `address ${id} not found` });
+
+    validField.forEach((field) => {
+      if (field in req.body) {
+        address[field] = req.body[field];
+      }
+    });
+
+    const newAddress = await address.save();
+
+    res.status(201).json(newAddress);
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);
