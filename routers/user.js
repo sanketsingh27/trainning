@@ -362,7 +362,6 @@ UserRouter.post("/images", async (req, res) => {
 });
 
 // - post /images/:id/comments → create a new comment attach it to image
-// - get /images/:id/comments → get all comment of a image
 
 UserRouter.post("/images/:id/comments", async (req, res) => {
   const { comment } = req.body;
@@ -387,6 +386,42 @@ UserRouter.post("/images/:id/comments", async (req, res) => {
     });
 
     res.status(201).json(finalComment);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+});
+
+// - get /images/:id/comments → get all comment of a image
+
+UserRouter.get("/images/:id/comments", async (req, res) => {
+  const { id: imageId } = req.params;
+
+  if (!imageId) {
+    return res.status(400).json({ message: "imageId  is required" });
+  }
+
+  try {
+    const image = await Image.findByPk(imageId, {
+      include: "comments",
+    });
+
+    // Temporarily override the toJSON method for comments
+    image.comments.forEach((comment) => {
+      comment.toJSON = () => ({
+        ...comment.get(),
+        commentableId: undefined,
+        commentableType: undefined,
+        createdAt: undefined,
+        updatedAt: undefined,
+      });
+    });
+
+    if (!image) {
+      return res.status(400).json({ message: `image ${imageId} not found ` });
+    }
+
+    res.status(201).json(image);
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);
