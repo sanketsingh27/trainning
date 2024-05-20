@@ -17,6 +17,15 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: "userId",
       });
     }
+
+    toJSON() {
+      return {
+        ...this.get(),
+        createdAt: undefined,
+        updatedAt: undefined,
+        UserRoles: undefined,
+      };
+    }
   }
   Rolls.init(
     {

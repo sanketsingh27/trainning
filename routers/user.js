@@ -284,4 +284,27 @@ UserRouter.post("/users/:userId/roles", async (req, res) => {
   }
 });
 
+UserRouter.get("/users/:userId/roles", async (req, res) => {
+  const { userId } = req.params;
+
+  if (!userId) {
+    return res.status(400).json({ message: "userId is are required" });
+  }
+
+  try {
+    // check if user exist
+    let user = await User.findByPk(userId, {
+      include: "rolls",
+    });
+
+    if (!user)
+      return res.status(500).json({ error: `user ${userId} not found` });
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+});
+
 module.exports = UserRouter;
