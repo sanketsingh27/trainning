@@ -1,4 +1,10 @@
-const { User, AadharCardDetails, Address, Image } = require("../models");
+const {
+  User,
+  AadharCardDetails,
+  Address,
+  Image,
+  Comment,
+} = require("../models");
 
 const { Router } = require("express");
 const UserRouter = Router();
@@ -336,8 +342,6 @@ UserRouter.put("/users/:userId/roles", async (req, res) => {
 });
 
 // - post /images  → create image
-// - post /images/:id/comments → create a new comment attach it to image
-// - get /images/:id/comments → get all comment of a image
 
 UserRouter.post("/images", async (req, res) => {
   const { url, width, height } = req.body;
@@ -351,6 +355,38 @@ UserRouter.post("/images", async (req, res) => {
   try {
     const image = await Image.create({ url, width, height });
     res.status(201).json(image);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+});
+
+// - post /images/:id/comments → create a new comment attach it to image
+// - get /images/:id/comments → get all comment of a image
+
+UserRouter.post("/images/:id/comments", async (req, res) => {
+  const { comment } = req.body;
+  const { id: imageId } = req.params;
+
+  if (!comment || !imageId) {
+    return res
+      .status(400)
+      .json({ message: "comment and imageId  are required" });
+  }
+
+  try {
+    const image = await Image.findByPk(imageId);
+    if (!image) {
+      return res.status(400).json({ message: `image ${imageId} not found ` });
+    }
+
+    const finalComment = await Comment.create({
+      text: comment,
+      commentableId: image.id,
+      commentableType: "image",
+    });
+
+    res.status(201).json(finalComment);
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);

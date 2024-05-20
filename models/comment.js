@@ -12,6 +12,10 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(Video, { foreignKey: "commentableId", as: "videos" });
       this.belongsTo(Image, { foreignKey: "commentableId", as: "images" });
     }
+
+    toJSON() {
+      return { ...this.get(), createdAt: undefined, updatedAt: undefined };
+    }
   }
   Comment.init(
     {
@@ -27,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      tableName: "comments",
+      tableName: "Comments",
       modelName: "Comment",
     }
   );
